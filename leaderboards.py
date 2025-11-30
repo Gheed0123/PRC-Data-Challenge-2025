@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 import requests
 import matplotlib.dates as mdates
 
+#Just a couple of plots of the leaderboard
+
 #%%init
 dfs=[]
 ylim = 1200 #my bad
@@ -154,4 +156,5 @@ ax.set_title('top 10 teams, scores sorted')
 ax.grid()
 ax.set_ylabel('score')
 ax.set_ylim(ymin,ymax)
+
 ax.legend(bbox_to_anchor=(1.1, 1.05),reverse=True)
