@@ -58,27 +58,34 @@ for teamname,group in df.groupby('teamName',sort=False):
     #group=pd.concat([group,pd.DataFrame({'processedAt':[final_time],'score':[group.score.min()]})])
     
     #label creation
-    version=str(int(group.version.max()))
-    version=str(len(group))
-    label=teamname+'_v'+version+'_'+str(group.score.min().round(2))
+    # version=str(int(group.version.max()))
+    # version=str(len(group))
+    #best version number
+    version=group.version[group.score==group.score.min()].iloc[0]
+    
+    label=teamname#+'_v'+str(version)+'_'+str(group.score.min().round(2))
     #label=teamname+'_'+str(group.score.min().round(2))
     
     #plot
     ax.semilogy(group.processedAt,group.score.values,label=label,marker='o',ms=3)
     
     #%%plot stuff
-    ax.set_title('team score over time')
+    ax.set_title(f'{label}')
     ax.grid()
+    ax.grid(which="minor", color="0.9")
     ax.set_ylabel('score')
-    ax.set_xlabel('submission time')
+    ax.set_xlabel('submit date')
+    ax.set_xlim(pd.Timestamp(year=2025,month=10,day=14),pd.Timestamp(year=2025,month=12,day=1))
 
-    ax.xaxis.set_major_formatter(mdates.DateFormatter('%m-%d %H'))
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%m-%d'))
     
     # Rotates and right-aligns the x labels so they don't crowd each other.
-    for label in ax.get_xticklabels(which='major'):
-        label.set(rotation=30, horizontalalignment='right')
+    for l in ax.get_xticklabels(which='major'):
+        l.set(rotation=30, horizontalalignment='right')
 
-    ax.legend()
+    #ax.legend()
+    plt.tight_layout()
+    plt.savefig('leaderboard_plots/'+label)
 #%%plot for all teams
 
 fig,ax=plt.subplots()
@@ -100,15 +107,16 @@ for teamname,group in df.groupby('teamName',sort=False):
     
     #plot
     ax.semilogy(group.processedAt,group.score.values,label=label,marker='o',ms=3)
-    
+    ax.grid()
+    ax.grid(which="minor", color="0.9")
 
 #%%plot stuff
 ax.set_title('team score over time')
 ax.grid()
 ax.set_ylabel('score')
-ax.set_xlabel('submission time')
+ax.set_xlabel('submit date')
 ax.set_ylim(ymin,ymax)
-ax.xaxis.set_major_formatter(mdates.DateFormatter('%m-%d %H'))
+ax.xaxis.set_major_formatter(mdates.DateFormatter('%m-%d'))
 
 # Rotates and right-aligns the x labels so they don't crowd each other.
 for label in ax.get_xticklabels(which='major'):
@@ -140,9 +148,9 @@ for teamname,group in df.groupby('teamName',sort=False):
 ax.set_title('improvement per team over time')
 ax.grid()
 ax.set_ylabel('score')
-ax.set_xlabel('submission time')
+ax.set_xlabel('submit date')
 ax.set_ylim(0,60)
-ax.xaxis.set_major_formatter(mdates.DateFormatter('%m-%d %H'))
+ax.xaxis.set_major_formatter(mdates.DateFormatter('%m-%d'))
 
 # Rotates and right-aligns the x labels so they don't crowd each other.
 for label in ax.get_xticklabels(which='major'):
