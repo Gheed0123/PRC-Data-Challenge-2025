@@ -46,6 +46,41 @@ df['version']=df.filename.str.extract('_v(.*)\.parquet').astype(int)
 final_time=df.processedAt.max()
 
 #%%plot data per team
+
+for teamname,group in df.groupby('teamName',sort=False):
+    fig,ax=plt.subplots()
+    group=group.sort_values('processedAt')
+    
+    #ignore all non-improved scores
+    group.score=group.score.cummin()
+    
+    #trace lines forward to final submit time
+    #group=pd.concat([group,pd.DataFrame({'processedAt':[final_time],'score':[group.score.min()]})])
+    
+    #label creation
+    version=str(int(group.version.max()))
+    version=str(len(group))
+    label=teamname+'_v'+version+'_'+str(group.score.min().round(2))
+    #label=teamname+'_'+str(group.score.min().round(2))
+    
+    #plot
+    ax.semilogy(group.processedAt,group.score.values,label=label,marker='o',ms=3)
+    
+    #%%plot stuff
+    ax.set_title('team score over time')
+    ax.grid()
+    ax.set_ylabel('score')
+    ax.set_xlabel('submission time')
+
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%m-%d %H'))
+    
+    # Rotates and right-aligns the x labels so they don't crowd each other.
+    for label in ax.get_xticklabels(which='major'):
+        label.set(rotation=30, horizontalalignment='right')
+
+    ax.legend()
+#%%plot for all teams
+
 fig,ax=plt.subplots()
 
 for teamname,group in df.groupby('teamName',sort=False):
@@ -65,6 +100,7 @@ for teamname,group in df.groupby('teamName',sort=False):
     
     #plot
     ax.semilogy(group.processedAt,group.score.values,label=label,marker='o',ms=3)
+    
 
 #%%plot stuff
 ax.set_title('team score over time')
@@ -156,5 +192,5 @@ ax.set_title('top 10 teams, scores sorted')
 ax.grid()
 ax.set_ylabel('score')
 ax.set_ylim(ymin,ymax)
-
 ax.legend(bbox_to_anchor=(1.1, 1.05),reverse=True)
+
